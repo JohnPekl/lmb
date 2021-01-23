@@ -45,7 +45,7 @@ class DefaultTargetInit:
         """Init new target from report."""
         r = min(report.rB * tracker.params.lambdaB(report),
                 tracker.params.rBmax, 1.0)
-        print("New target:", r, "lambdaB", tracker.params.lambdaB(report))
+        #print("New target:", r, "lambdaB", tracker.params.lambdaB(report))
         if r < 1e-6:
             return None
         id_ = tracker.new_id()
