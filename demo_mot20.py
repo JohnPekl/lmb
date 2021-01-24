@@ -18,50 +18,51 @@ import os
 import sys
 import argparse
 import numpy as np
-
-sys.path.append(
-    os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))))
+from datetime import datetime
+import time
 import lmb
-
-
-np.random.seed(1)
-
 import cv2
 from os import path
 import collections
-names=collections.defaultdict(list)
-detections=collections.defaultdict(list)
-relpath='../MOT20-04/'
-# Store the image names.
-for file in os.listdir(path.join(relpath,'img1')):
-    if file.endswith('.jpg'):
-        name,extension=file.split('.')
-        names[int(name)]=file
-# Load the detections.
-#<frame>, <id>, <bb_left>, <bb_top>, <bb_width>, <bb_height>, <conf>, <x>, <y>
-with open(path.join(relpath,'det/det.txt'),mode='r') as file:
-    for line in file:
-        frame, id, bb_left, bb_top, bb_width, bb_height, conf, x, y= map(int,line.split(',')[:-1])
-        #frame,col,row,width,height=map(int,line.split(',')[:-1])
-        detections[frame].append(np.array([bb_left, bb_top, bb_width, bb_height]))#((0,2) (1,3)
 
-from datetime import  datetime
-#github.com
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def read_mot(relpath='../MOT20-04/'):
+    names = collections.defaultdict(list)
+    detections = collections.defaultdict(list)
+    # Store the image names.
+    for file in os.listdir(path.join(relpath, 'img1')):
+        if file.endswith('.jpg'):
+            name, extension = file.split('.')
+            names[int(name)] = file
+    # Load the detections.
+    # <frame>, <id>, <bb_left>, <bb_top>, <bb_width>, <bb_height>, <conf>, <x>, <y>
+    with open(path.join(relpath, 'det/det.txt'), mode='r') as file:
+        for line in file:
+            frame, id, bb_left, bb_top, bb_width, bb_height, conf, x, y = map(int, line.split(',')[:-1])
+            # frame,col,row,width,height=map(int,line.split(',')[:-1])
+            detections[frame].append(np.array([bb_left, bb_top, bb_width, bb_height]))  # ((0,2) (1,3)
+
+    return names, detections
+
+
 def draw():
     """Create plot."""
     params = lmb.Parameters()
     params.N_max = 50000
     params.kappa = lmb.models.UniformClutter(0.0001)
     params.init_target = lmb.DefaultTargetInit(0.1, 1, 1)
-    params.r_lim = 0.00104# 0.0010416666666666667
+    params.r_lim = 0.00104  # 0.0010416666666666667
     params.nstd = 10
     tracker = lmb.LMB(params)
     sensor = lmb.sensors.EyeOfMordor()
     sensor.lambdaB = 0.1
 
-    for frame in range(min(names.keys()), max(names.keys())):
+    names, detections = read_mot()
 
+    for frame in range(min(names.keys()), max(names.keys())):
+        start = time.time()
         if frame > 1:
             tracker.predict(1)
         reports = {lmb.GaussianReport(
@@ -72,25 +73,30 @@ def draw():
             i)
             for i, obs in enumerate(detections[frame])}
 
-        print('frame:', frame, datetime.now().strftime("%H:%M:%S"))
         this_scan = lmb.Scan(sensor, reports)
         tracker.register_scan(this_scan)
+        fps = time.time() - start
+        print('frame:', frame, datetime.now().strftime("%H:%M:%S"))
 
-        img = cv2.imread(path.join(relpath, 'img1', names[frame]))
+        img = cv2.imread(path.join('../MOT20-04/img1', names[frame]))
         targets = tracker.query_targets()
         print('enof_targets %s, nof_targets %s, detection(len) %s' % (tracker.enof_targets(),
-              tracker.nof_targets(), len(detections[frame])))
+                                                                      tracker.nof_targets(), len(detections[frame])))
+        img = cv2.putText(img, 'Frame {}'.format(frame) + ', FPS:{}'.format(round(1 / fps, 2)),
+                            org=(1145, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
+                            color=(255, 255, 255), thickness=2)
         for t in targets:
-            ty,r,x,P = t.history[-1]
-            img = cv2.circle(img, (int(x[0]), int(x[1])), radius=10,color=(255, 255, 255), thickness=-1)
+            ty, r, x, P = t.history[-1]
+            img = cv2.circle(img, (int(x[0]), int(x[1])), radius=10, color=(255, 255, 255), thickness=-1)
             img = cv2.putText(img, str(t.id),
-                                org=(int(x[0]), int(x[1])), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.65,
-                                color=(0, 255, 255), thickness=1)
+                              org=(int(x[0]), int(x[1])), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.65,
+                              color=(0, 255, 255), thickness=1)
         for t in detections[frame]:
             bbox = t.astype(int)
-            img = cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), color=(0, 0, 0), thickness=2)
-        cv2.imshow('DKM', img)
-        cv2.imwrite(relpath+'/output/'+ str(frame)+'.jpg', img)
+            img = cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color=(0, 0, 0),
+                                thickness=2)
+        cv2.imshow('Image', img)
+        cv2.imwrite('../MOT20-04/output/' + str(frame) + '.jpg', img)
         cv2.waitKey(1)
 
 
