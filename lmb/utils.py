@@ -91,6 +91,8 @@ def cov_ellipse(cov, nstd):
 def gaussian_bbox(x, P, nstd=2):
     """Return boudningbox for gaussian."""
     r1, r2, theta = cov_ellipse(P, nstd)
+    # matrix multiplication, use np.dot (or @ in Python >= 3.5)
+    # as of Python 3.5, NumPy supports infix matrix multiplication using the @ operator,
     corners = rotmat(theta) @ np.array([[-r1, -r1, r1, r1], [r2, -r2, -r2, r2]]) + x[:, np.newaxis]
     return Polygon(corners.T)
 

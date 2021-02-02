@@ -28,7 +28,7 @@ import collections
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # bbox convention: IIRC, (llx, lly, urx, ury) (for ll: lower left, ur: upper right)
 
-def read_mot(relpath='../MOT20-04/'):
+def read_mot(relpath='../MOT17-02/'):
     names = collections.defaultdict(list)
     detections = collections.defaultdict(list)
     # Store the image names.
@@ -38,9 +38,10 @@ def read_mot(relpath='../MOT20-04/'):
             names[int(name)] = file
     # Load the detections.
     # <frame>, <id>, <bb_left>, <bb_top>, <bb_width>, <bb_height>, <conf>, <x>, <y>
-    with open(path.join(relpath, 'det/det.txt'), mode='r') as file:
+    with open(path.join(relpath, 'gt/gt.txt'), mode='r') as file:
         for line in file:
-            frame, id, bb_left, bb_top, bb_width, bb_height, conf, x, y = map(int, line.split(',')[:-1])
+            line = line.replace('\n','')
+            frame, id, bb_left, bb_top, bb_width, bb_height, conf, x, y = map(float, line.split(','))
             # frame,col,row,width,height=map(int,line.split(',')[:-1])
             detections[frame].append(np.array([bb_left, bb_top, bb_width, bb_height]))  # ((0,2) (1,3)
 
@@ -78,7 +79,7 @@ def draw():
         fps = time.time() - start
         print('frame:', frame, datetime.now().strftime("%H:%M:%S"))
 
-        img = cv2.imread(path.join('../MOT20-04/img1', names[frame]))
+        img = cv2.imread(path.join('../MOT17-02/img1', names[frame]))
         targets = tracker.query_targets()
         print('enof_targets %s, nof_targets %s, detection(len) %s' % (tracker.enof_targets(),
                                                                       tracker.nof_targets(), len(detections[frame])))
@@ -95,8 +96,14 @@ def draw():
             bbox = t.astype(int)
             img = cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color=(0, 0, 0),
                                 thickness=2)
-        cv2.imshow('Image', img)
-        cv2.imwrite('../MOT20-04/output/' + str(frame) + '.jpg', img)
+        scale_percent = 60  # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        # resize image
+        resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+        cv2.imshow('Image', resized)
+        cv2.imwrite('../MOT17-02/output/' + str(frame) + '.jpg', img)
         cv2.waitKey(1)
 
 

@@ -62,12 +62,12 @@ class Satellite(SquareSensor):
 class EyeOfMordor(SquareSensor):
     """Ideal sensor that sees all."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, width, height, *args, **kwargs):
         """Init."""
-        super().__init__([(-LARGE, LARGE),
-                          (-LARGE, -LARGE),
-                          (LARGE, -LARGE),
-                          (LARGE, LARGE)], *args, **kwargs)
+        super().__init__([(0, height),
+                          (0, 0),
+                          (width, 0),
+                          (width, height)], *args, **kwargs)
 
     def pD(self, states):
         """Probability of detection for states x."""

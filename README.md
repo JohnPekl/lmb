@@ -23,4 +23,4 @@ Tracking Result:
 ![Alt Text](./MOT20-04/mot20.gif)
 
 # License
-Refer to the original [lmb](https://github.com/jonatanolofsson/lmb) repository by [danstowell](https://github.com/jonatanolofsson).
+Refer to the original [lmb](https://github.com/jonatanolofsson/lmb) repository by [jonatanolofsson](https://github.com/jonatanolofsson).
