@@ -51,10 +51,10 @@ def read_mot(relpath='../MOT17-02/'):
 def draw():
     """Create plot."""
     params = lmb.Parameters()
-    params.N_max = 50000
+    params.N_max = 100
     params.kappa = lmb.models.UniformClutter(0.0001)
     params.init_target = lmb.DefaultTargetInit(0.1, 1, 1)
-    params.r_lim = 0.00104  # 0.0010416666666666667
+    params.r_lim = 0.0025  # 0.002564102564102564
     params.nstd = 5
     tracker = lmb.LMB(params)
     sensor = lmb.sensors.EyeOfMordor(width=1545, height=1080)

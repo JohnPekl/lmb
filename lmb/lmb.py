@@ -66,15 +66,18 @@ class Parameters:
         for name, value in kwargs.items():
             self.__dict__[name] = value
 
-Parameters.N_max = 10000
-Parameters.rBmax = 0.8
-Parameters.lambdaB = staticmethod(lambda r: r.sensor.lambdaB)
-Parameters.kappa = models.UniformClutter(0.01)
-Parameters.init_target = DefaultTargetInit(1, 1, 1)
-Parameters.w_lim = 1e-4
-Parameters.maxhyp = 1e3
-Parameters.r_lim = 1e-3
-Parameters.nstd = 2
+        self.N_max = 10000
+        self.rBmax = 0.8
+        self.kappa = models.UniformClutter(0.01)
+        self.init_target = DefaultTargetInit(1, 1, 1)
+        self.w_lim = 1e-4
+        self.maxhyp = 1e3
+        self.r_lim = 1e-3
+        self.nstd = 2
+
+    @staticmethod
+    def lambdaB(r):
+        return r.sensor.lambdaB
 
 
 class LMB:
@@ -207,7 +210,7 @@ class LMB:
         for t in targets:
             if t is not None:
                 if any(isnan(p) for p in t.aa_bbox()):
-                    print("NAN!:", target, target.pdf)
+                    print("NAN!:", t, t.pdf)
                     exit()
                 self.db.execute(("REPLACE INTO target_index "
                                  "(id, min_x, min_y, max_x, max_y) "
