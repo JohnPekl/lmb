@@ -40,10 +40,10 @@ class ConstantVelocityModel:
                        [0, 1, 0, dT],
                        [0, 0, 1, 0],
                        [0, 0, 0, 1]])
-        Q = np.array([[dT ** 3 / 3, 0,           dT ** 2 / 2, 0],
-                      [0,           dT ** 3 / 3, 0,           dT ** 2 / 2],
-                      [dT ** 2 / 2, 0,           dT,          0],
-                      [0,           dT ** 2 / 2, 0,           dT]]) * self.q
+        Q = np.array([[10 ** 2, 0, 0, 0],  # process noise covariance
+                      [0, 7 ** 2, 0, 0],
+                      [0, 0, 10 ** 2, 0],
+                      [0, 0, 0, 7 ** 2]]) * 1 / 2
 
         e = sample_normal(Q, len(pdf.x))
         pdf.x = (F @ pdf.x.T).T + e

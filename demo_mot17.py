@@ -26,6 +26,8 @@ from os import path
 import collections
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 # bbox convention: IIRC, (llx, lly, urx, ury) (for ll: lower left, ur: upper right)
 
 def read_mot(relpath='../MOT17-02/'):
@@ -40,7 +42,7 @@ def read_mot(relpath='../MOT17-02/'):
     # <frame>, <id>, <bb_left>, <bb_top>, <bb_width>, <bb_height>, <conf>, <x>, <y>
     with open(path.join(relpath, 'gt/gt.txt'), mode='r') as file:
         for line in file:
-            line = line.replace('\n','')
+            line = line.replace('\n', '')
             frame, id, bb_left, bb_top, bb_width, bb_height, conf, x, y = map(float, line.split(','))
             # frame,col,row,width,height=map(int,line.split(',')[:-1])
             detections[frame].append(np.array([bb_left, bb_top, bb_width, bb_height]))  # ((0,2) (1,3)
@@ -84,18 +86,14 @@ def draw():
         print('enof_targets %s, nof_targets %s, detection(len) %s' % (tracker.enof_targets(),
                                                                       tracker.nof_targets(), len(detections[frame])))
         img = cv2.putText(img, 'Frame {}'.format(frame) + ', FPS:{}'.format(round(1 / fps, 2)),
-                            org=(1145, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
-                            color=(255, 255, 255), thickness=2)
+                          org=(img.shape[1] - 400, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
+                          color=(255, 255, 255), thickness=2)
         for t in targets:
             ty, r, x, P = t.history[-1]
-            img = cv2.circle(img, (int(x[0]), int(x[1])), radius=10, color=(255, 255, 255), thickness=-1)
+            img = cv2.circle(img, (int(x[0]), int(x[1])), radius=8, color=(255, 255, 255), thickness=-1)
             img = cv2.putText(img, str(t.id),
-                              org=(int(x[0]), int(x[1])), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.65,
-                              color=(0, 255, 255), thickness=1)
-        for t in detections[frame]:
-            bbox = t.astype(int)
-            img = cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color=(0, 0, 0),
-                                thickness=2)
+                              org=(int(x[0]) + 5, int(x[1]) + 5), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.65,
+                              color=(0, 255, 255), thickness=2)
         scale_percent = 60  # percent of original size
         width = int(img.shape[1] * scale_percent / 100)
         height = int(img.shape[0] * scale_percent / 100)
