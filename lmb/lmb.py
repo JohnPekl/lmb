@@ -70,14 +70,14 @@ class Parameters:
         for name, value in kwargs.items():
             self.__dict__[name] = value
 
-        self.N_max = 10000
-        self.rBmax = 0.8
-        self.kappa = models.UniformClutter(0.01)
-        self.init_target = DefaultTargetInit(1, 1, 1)
-        self.w_lim = 1e-4
-        self.maxhyp = 1e3
-        self.r_lim = 1e-3
-        self.nstd = 2
+        # self.N_max = 10000
+        # self.rBmax = 0.8
+        # self.kappa = models.UniformClutter(0.01)
+        # self.init_target = DefaultTargetInit(1, 1, 1)
+        # self.w_lim = 1e-4
+        # self.maxhyp = 1e3
+        # self.r_lim = 1e-3
+        # self.nstd = 2
 
     @staticmethod
     def lambdaB(r):

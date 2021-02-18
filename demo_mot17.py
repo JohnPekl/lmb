@@ -56,8 +56,11 @@ def draw():
     params.N_max = 100
     params.kappa = lmb.models.UniformClutter(0.0001)
     params.init_target = lmb.DefaultTargetInit(0.1, 1, 1)
-    params.r_lim = 0.0025  # 0.002564102564102564
-    params.nstd = 5
+    params.r_lim = 0.00256  # 0.002564102564102564
+    params.nstd = 20
+    params.rBmax = 0.8
+    params.w_lim = 1e-4
+    params.maxhyp = 1e3
     tracker = lmb.LMB(params)
     sensor = lmb.sensors.EyeOfMordor(width=1545, height=1080)
     sensor.lambdaB = 0.1
