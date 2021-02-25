@@ -53,10 +53,10 @@ class DefaultTargetInit:
 
         x0 = np.array([report.z[0], report.z[1], 0.0, 0.0])
         #P0 = block_diag(report.R, self.pv)
-        P0 = np.array([[10 ** 2, 0, 0, 0],  # covariance matrix of state
-                       [0, 7 ** 2, 0, 0],
-                       [0, 0, 10 ** 2, 0],
-                       [0, 0, 0, 7 ** 2]])
+        P0 = np.array([[5 ** 2, 0, 0, 0],  # covariance matrix of state
+                       [0, 3 ** 2, 0, 0],
+                       [0, 0, 5 ** 2, 0],
+                       [0, 0, 0, 3 ** 2]])
         pdf = PF.from_gaussian(x0, P0, tracker.params.N_max)
 
         return Target(id_, model, r, pdf)

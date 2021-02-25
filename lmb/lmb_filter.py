@@ -62,11 +62,11 @@ def correct(args):
         assignment[assignment >= M] = M
         weights[ind, assignment[ind]] += w
 
-        if w / (w_sum+1e-10) < params.w_lim or nhyps >= params.maxhyp:
+        if w / w_sum < params.w_lim or nhyps >= params.maxhyp:
             break
     #print("nhyps:", nhyps, "tracks:", N, "meas:", M)
 
-    weights /= (w_sum+1e-10)
+    weights /= w_sum
 
     for i, t in enumerate(targets):
         t.correct(weights[i, ])

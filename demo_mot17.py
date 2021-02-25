@@ -60,17 +60,19 @@ def draw():
     params.nstd = 20
     params.rBmax = 0.8
     params.w_lim = 1e-4
-    params.maxhyp = 1e3
+    params.maxhyp = 1e2
     tracker = lmb.LMB(params)
     sensor = lmb.sensors.EyeOfMordor(width=1545, height=1080)
     sensor.lambdaB = 0.1
 
     names, detections = read_mot()
+    targets = None
 
     for frame in range(min(names.keys()), max(names.keys())):
         start = time.time()
         if frame > 1:
             tracker.predict(1)
+            targets = tracker.query_targets()
         reports = {lmb.GaussianReport(
             # np.random.multivariate_normal(t[0:2], np.diag([0.01] * 2)),  # noqa
             (obs[:2] + obs[2:] / 2.0),
@@ -82,10 +84,12 @@ def draw():
         this_scan = lmb.Scan(sensor, reports)
         tracker.register_scan(this_scan)
         fps = time.time() - start
-        print('frame:', frame, datetime.now().strftime("%H:%M:%S"))
 
+        # Display tracking results
+        if targets is None:
+            targets = tracker.query_targets()
+        print('frame:', frame, datetime.now().strftime("%H:%M:%S"))
         img = cv2.imread(path.join('../MOT17-02/img1', names[frame]))
-        targets = tracker.query_targets()
         print('enof_targets %s, nof_targets %s, detection(len) %s' % (tracker.enof_targets(),
                                                                       tracker.nof_targets(), len(detections[frame])))
         img = cv2.putText(img, 'Frame {}'.format(frame) + ', FPS:{}'.format(round(1 / fps, 2)),
