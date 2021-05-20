@@ -17,7 +17,7 @@
 
 import queue
 from copy import copy
-from lapjv import lap
+import lap
 
 from .utils import LARGE
 
@@ -57,7 +57,7 @@ def murty(C):
         Q = queue.PriorityQueue()
         M = C.shape[0]
         N = C.shape[1]
-        cost, assign = lap(C)[0:2]
+        cost, assign = lap.lapjv(C, extend_cost=True)[0:2]
         Q.put((cost, list(assign),
                (), (),
                (), ()))
@@ -81,7 +81,7 @@ def murty(C):
                 removed_value = C_[t, t]
                 C_[t, t] = LARGE
 
-                cost, lassign = lap(C_[t:, t:])[0:2]
+                cost, lassign = lap.lapjv(C_[t:, t:], extend_cost=True)[0:2]
                 if LARGE not in C_[range(t, t + len(lassign)), lassign + t]:
                     cost += C[S[2], S[3]].sum()
                     cost += C_[range(t), range(t)].sum()
